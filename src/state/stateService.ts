@@ -1,37 +1,34 @@
 /**
  * @coreapi
  * @module state
- */ /** */
-import {
-    extend, defaults, silentRejection, silenceUncaughtInPromise, removeFrom, noop, createProxyFunctions, inArray
-} from "../common/common";
-import {isDefined, isObject, isString} from "../common/predicates";
-import {Queue} from "../common/queue";
-import {services} from "../common/coreservices";
+ */
+/** */
+import { createProxyFunctions, defaults, extend, inArray, noop, removeFrom, silenceUncaughtInPromise, silentRejection } from '../common/common';
+import { isDefined, isObject, isString } from '../common/predicates';
+import { Queue } from '../common/queue';
+import { services } from '../common/coreservices';
 
-import {PathFactory} from "../path/pathFactory";
-import {PathNode} from "../path/node";
+import { PathFactory } from '../path/pathFactory';
+import { PathNode } from '../path/node';
 
-import {TransitionOptions, HookResult} from "../transition/interface";
-import {defaultTransOpts} from "../transition/transitionService";
-import {Rejection, RejectType} from "../transition/rejectFactory";
-import {Transition} from "../transition/transition";
+import { HookResult, TransitionOptions } from '../transition/interface';
+import { defaultTransOpts } from '../transition/transitionService';
+import { Rejection, RejectType } from '../transition/rejectFactory';
+import { Transition } from '../transition/transition';
 
-import {StateOrName, StateDeclaration, TransitionPromise, LazyLoadResult} from "./interface";
-import {StateObject} from "./stateObject";
-import {TargetState} from "./targetState";
+import { HrefOptions, LazyLoadResult, StateDeclaration, StateOrName, TransitionPromise } from './interface';
+import { StateObject } from './stateObject';
+import { TargetState } from './targetState';
 
-import {RawParams} from "../params/interface";
-import {ParamsOrArray} from "../params/interface";
-import {Param} from "../params/param";
-import {Glob} from "../common/glob";
-import {HrefOptions} from "./interface";
-import {UIRouter} from "../router";
-import {UIInjector} from "../interface";
-import {ResolveContext} from "../resolve/resolveContext";
-import {StateParams} from "../params/stateParams"; // has or is using
-import {lazyLoadState} from "../hooks/lazyLoad";
-import { val, not } from "../common/hof";
+import { ParamsOrArray, RawParams } from '../params/interface';
+import { Param } from '../params/param';
+import { Glob } from '../common/glob';
+import { UIRouter } from '../router';
+import { UIInjector } from '../interface';
+import { ResolveContext } from '../resolve/resolveContext';
+import { lazyLoadState } from '../hooks/lazyLoad';
+import { not, val } from '../common/hof';
+import { StateParams } from '../params/stateParams';
 
 export type OnInvalidCallback =
     (toState?: TargetState, fromState?: TargetState, injector?: UIInjector) => HookResult;
@@ -51,25 +48,25 @@ export class StateService {
    *
    * This is a passthrough through to [[UIRouterGlobals.transition]]
    */
-  get transition()  { return this.router.globals.transition; }
+  get transition() { return this.router.globals.transition; }
   /**
    * The latest successful state parameters
    *
    * This is a passthrough through to [[UIRouterGlobals.params]]
    */
-  get params()      { return this.router.globals.params; }
+  get params(): StateParams { return this.router.globals.params; }
   /**
    * The current [[StateDeclaration]]
    *
    * This is a passthrough through to [[UIRouterGlobals.current]]
    */
-  get current()     { return this.router.globals.current; }
+  get current() { return this.router.globals.current; }
   /**
    * The current [[StateObject]]
    *
    * This is a passthrough through to [[UIRouterGlobals.$current]]
    */
-  get $current()    { return this.router.globals.$current; }
+  get $current() { return this.router.globals.$current; }
 
   /** @internalapi */
   constructor(private router: UIRouter) {
@@ -208,7 +205,7 @@ export class StateService {
     return this.transitionTo(this.current, this.params, {
       reload: isDefined(reloadState) ? reloadState : true,
       inherit: false,
-      notify: false
+      notify: false,
     });
   };
 
@@ -234,13 +231,14 @@ export class StateService {
    * });
    * ```
    *
+   * @param to Absolute state name, state object, or relative state path (relative to current state).
    *
-   * @param to Absolute state name, state object, or relative state path. Some examples:
+   * Some examples:
    *
    * - `$state.go('contact.detail')` - will go to the `contact.detail` state
-   * - `$state.go('^')` - will go to a parent state
-   * - `$state.go('^.sibling')` - will go to a sibling state
-   * - `$state.go('.child.grandchild')` - will go to grandchild state
+   * - `$state.go('^')` - will go to the parent state
+   * - `$state.go('^.sibling')` - if current state is `home.child`, will go to the `home.sibling` state
+   * - `$state.go('.child.grandchild')` - if current state is home, will go to the `home.child.grandchild` state
    *
    * @param params A map of the parameters that will be sent to the state, will populate $stateParams.
    *
@@ -250,16 +248,6 @@ export class StateService {
    * @param options Transition options
    *
    * @returns {promise} A promise representing the state of the new transition.
-   *
-   * - Possible success values:
-   *    - $state.current
-   *
-   * - Possible rejection reasons:
-   *   - transition superseded - when a newer transition has been started after this one
-   *   - transition aborted - when the transition is cancelled by a Transition Hook returning `false`
-   *   - transition failed - when a transition hook errors
-   *   - resolve error - when a resolve has errored or rejected
-   *
    */
   go(to: StateOrName, params?: RawParams, options?: TransitionOptions): TransitionPromise {
     let defautGoOpts = { relative: this.$current, inherit: true };
@@ -499,7 +487,7 @@ export class StateService {
       lossy:    true,
       inherit:  true,
       absolute: false,
-      relative: this.$current
+      relative: this.$current,
     };
     options = defaults(options, defaultHrefOpts);
     params = params || {};
@@ -514,8 +502,8 @@ export class StateService {
     if (!nav || nav.url === undefined || nav.url === null) {
       return null;
     }
-    return this.router.urlRouter.href(nav.url, Param.values(state.parameters(), params), {
-      absolute: options.absolute
+    return this.router.urlRouter.href(nav.url, params, {
+      absolute: options.absolute,
     });
   };
 

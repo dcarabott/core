@@ -1,7 +1,7 @@
 {
   "name": "sn-ui-router-core",
   "description": "UI-Router Core: Framework agnostic, State-based routing for JavaScript Single Page Apps",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "scripts": {
     "clean": "shx rm -rf lib lib-esm",
     "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && npm run fixdts",
@@ -13,7 +13,9 @@
     "watch:buildesm": "tsc -w -m es6 --outDir lib-esm",
     "watch:dts-downlevel": "npm run fixdts",
     "watch:test": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1",
-    "debug": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1 --browsers=Chrome"
+    "debug": "karma start --singleRun=false --autoWatch=true --autoWatchInterval=1 --browsers=Chrome",
+    "changelog": "node scripts/update_changelog.js",
+    "release": "node scripts/release.js"
   },
   "homepage": "https://ui-router.github.io",
   "contributors": [
@@ -77,7 +79,7 @@
     "readline-sync": "^1.4.4",
     "shelljs": "^0.7.0",
     "shx": "^0.1.4",
-    "tslint": "=2.5.0",
+    "tslint": "^4.5.1",
     "typescript": "^2.1.4",
     "webpack": "^1.13.3"
   }
